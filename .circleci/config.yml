@@ -4,6 +4,27 @@ orbs:
   slack: circleci/slack@4.9.3
 
 commands:
+  install_awscli:
+    description: Install AWS CLI v2
+    steps:
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  install_ansible:
+    description: Install Ansible v2
+    steps:
+      - run:
+          name: Install Ansible v2
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
+
   notify_on_failure:
     steps:
       - slack/notify:
@@ -128,7 +149,7 @@ jobs:
 
   scan-backend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: cimg/base:stable
     steps:
       - checkout
       - restore_cache:
@@ -143,171 +164,176 @@ jobs:
             npm audit --audit-level=critical
       - notify_on_failure
 
-#   deploy-infrastructure:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Ensure back-end infrastructure exists
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file .circleci/files/backend.yml \
-#               #--tags project=your-tag \
-#               # --stack-name "your back-end stack name with workflow id" \
-#               # --parameter-overrides ID="your workflow id"
-#               exit 1
-#       - run:
-#           name: Ensure front-end infrastructure exist
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file .circleci/files/frontend.yml \
-#               #--tags project=your-tag \
-#               # --stack-name "your front-end stack name with workflow id" \
-#               # --parameter-overrides ID="your workflow id"
-#               exit 1
-#       - run:
-#           name: Add back-end ip to ansible inventory
-#           command: |
-#             # Your code here
-#             exit 1
-#       - persist_to_workspace:
-#           root: ~/
-#           paths:
-#             - project/.circleci/ansible/inventory.txt
-#       # Here's where you will add some code to rollback on failure
+  deploy-infrastructure:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              exit 1
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              exit 1
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+              echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+              cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+              # Here's where you will add some code to rollback on failure
 
-#   configure-infrastructure:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Configure server
-#           command: |
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure
+  #   configure-infrastructure:
+  #     docker:
+  #       # Docker image here that supports Ansible
+  #     steps:
+  #       # Checkout code from git
+  #       # Add ssh keys with fingerprint
+  #       # attach workspace
+  #       - run:
+  #           name: Install dependencies
+  #           command: |
+  #             # Your code here
+  #             exit 1
+  #       - run:
+  #           name: Configure server
+  #           command: |
+  #             # Your code here
+  #             exit 1
+  #       # Here's where you will add some code to rollback on failure
 
-#   run-migrations:
-#     docker:
-#       # Docker image here that supports NodeJS
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Run migrations
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Send migration results to memstash
-#           command: |
-#             # Your code here
-#             exit 1
-#      # Here's where you will add some code to rollback on failure
+  #   run-migrations:
+  #     docker:
+  #       # Docker image here that supports NodeJS
+  #     steps:
+  #       # Checkout code from git
+  #       - run:
+  #           name: Run migrations
+  #           command: |
+  #             # Your code here
+  #             exit 1
+  #       - run:
+  #           name: Send migration results to memstash
+  #           command: |
+  #             # Your code here
+  #             exit 1
+  #      # Here's where you will add some code to rollback on failure
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure
+  #   deploy-frontend:
+  #     docker:
+  #       # Docker image here that supports AWS CLI
+  #     steps:
+  #       # Checkout code from git
+  #       - run:
+  #           name: Install dependencies
+  #           command: |
+  #             # your code here
+  #       - run:
+  #           name: Get backend url
+  #           command: |
+  #             # your code here
+  #             export API_URL="http://${BACKEND_IP}:3030"
+  #             echo "${API_URL}"
+  #       - run:
+  #           name: Deploy frontend objects
+  #           command: |
+  #             # your code here
+  #       # Here's where you will add some code to rollback on failure
 
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure
+  #   deploy-backend:
+  #     docker:
+  #       # Docker image here that supports Ansible
+  #     steps:
+  #       # Checkout code from git
+  #       # Add ssh keys with fingerprint
+  #       # attach workspace
+  #       - run:
+  #           name: Install dependencies
+  #           command: |
+  #             # your code here
+  #       - run:
+  #           name: Deploy backend
+  #           command: |
+  #             # your code here
+  #       # Here's where you will add some code to rollback on failure
 
-#   smoke-test:
-#     docker:
-#       # Lightweight Docker image
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure
+  #   smoke-test:
+  #     docker:
+  #       # Lightweight Docker image
+  #     steps:
+  #       # Checkout code from git
+  #       - run:
+  #           name: Install dependencies
+  #           command: |
+  #             # your code here
+  #       - run:
+  #           name: Get backend url
+  #           command: |
+  #             # your code here
+  #       - run:
+  #           name: Backend smoke test.
+  #           command: |
+  #             # your code here
+  #       - run:
+  #           name: Frontend smoke test.
+  #           command: |
+  #             # your code here
+  #       # Here's where you will add some code to rollback on failure
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Update cloudfront distribution
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure
+  #   cloudfront-update:
+  #     docker:
+  #       # Docker image here that supports AWS CLI
+  #     steps:
+  #       # Checkout code from git
+  #       - run:
+  #           name: Install dependencies
+  #           command: |
+  #             # your code here
+  #       - run:
+  #           name: Update cloudfront distribution
+  #           command: |
+  #             # your code here
+  #       # Here's where you will add some code to rollback on failure
 
-# cleanup:
-#     docker:
-#       # Docker image here
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Get old stack workflow id
-#           command: |
-#             # your code here
-#             export OldWorkflowID="the id here"
-#             export STACKS=[] #put the list of stacks here
-#       - run:
-#           name: Remove old stacks and files
-#           command: |
-#             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-#             then
-#               # your code here
-#             fi
-  
+  # cleanup:
+  #     docker:
+  #       # Docker image here
+  #     steps:
+  #       # Checkout code from git
+  #       - run:
+  #           name: Get old stack workflow id
+  #           command: |
+  #             # your code here
+  #             export OldWorkflowID="the id here"
+  #             export STACKS=[] #put the list of stacks here
+  #       - run:
+  #           name: Remove old stacks and files
+  #           command: |
+  #             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+  #             then
+  #               # your code here
+  #             fi
+
   notify_on_success:
     docker:
       - image: cimg/base:stable
