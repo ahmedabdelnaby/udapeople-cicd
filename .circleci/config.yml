@@ -166,7 +166,7 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: cimg/base:stable
+      - image: amazon/aws-cli
     steps:
       - checkout
       - install_awscli
@@ -199,7 +199,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-              # Here's where you will add some code to rollback on failure
+      - notify_on_failure
 
   #   configure-infrastructure:
   #     docker:
