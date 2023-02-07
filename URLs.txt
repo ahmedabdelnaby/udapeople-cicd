@@ -1,0 +1,9 @@
+## Give Your Application Auto-Deploy Superpowers - Project Submission
+
+## The Needed Links
+
+1. [Github Repository] (https://github.com/ahmedabdelnaby/udapeople-cicd).
+2. [S3 Bucket] (http://udapeople-83c292b.s3-website-us-west-2.amazonaws.com).
+3. [CloudFront Destination] (http://dsc1epkmrkkmn.cloudfront.net).
+4. [The Deployed App on EC2] (ec2-54-201-111-82.us-west-2.compute.amazonaws.com).
+5. [Prometheues Server] (ec2-54-201-111-82.us-west-2.compute.amazonaws.com).
