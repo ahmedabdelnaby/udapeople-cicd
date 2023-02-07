@@ -208,7 +208,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/node:13.8.0
+      - image: cimg/base:stable
     steps:
       - checkout
       - install_ansible
@@ -228,7 +228,7 @@ jobs:
 
   run-migrations:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - install_awscli
