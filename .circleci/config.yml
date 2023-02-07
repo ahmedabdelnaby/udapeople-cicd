@@ -471,8 +471,8 @@ workflows:
             - deploy-frontend
             - deploy-backend
             - smoke-test
-            - cloudfront-update
-            - cleanup
+            # - cloudfront-update
+            # - cleanup
           post-steps:
             - slack/notify:
                 custom: |
