@@ -27,7 +27,7 @@ async function bootstrap() {
     .setDescription('Glee2 API')
     .setVersion('1.0')
     .addTag('customTag')
-    .setBasePath(apiVersionPrefix)
+    .setBasePath(apiVersionPrefixx)
     .addBearerAuth()xxxxxxx
     .build();
   const document = SwaggerModule.createDocument(app, options);
