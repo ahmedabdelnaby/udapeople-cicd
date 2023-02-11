@@ -461,68 +461,68 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
-      # - notify_on_success:
-      #     context: [slack]
-      #     requires:
-      #       - build-frontend
-      #       - build-backend
-      #       - test-frontend
-      #       - test-backend
-      #       - scan-backend
-      #       - scan-frontend
-      #       - deploy-infrastructure
-      #       - configure-infrastructure
-      #       - run-migrations
-      #       - deploy-frontend
-      #       - deploy-backend
-      #       - smoke-test
-      #       - cloudfront-update
-      #       - cleanup
-      #     post-steps:
-      #       - slack/notify:
-      #           custom: |
-      #             {
-      #               "text": "",
-      #               "blocks": [
-      #                 {
-      #                   "type": "section",
-      #                   "text": {
-      #                     "type": "mrkdwn",
-      #                     "text": "✅ *Success* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
-      #                   }
-      #                 },
-      #                 {
-      #                   "type": "actions",
-      #                   "elements": [
-      #                     {
-      #                       "type": "button",
-      #                       "text": {
-      #                         "type": "plain_text",
-      #                         "text": "View Job"
-      #                       },
-      #                       "url": "${CIRCLE_BUILD_URL}"
-      #                     }
-      #                   ]
-      #                 }
-      #               ]
-      #             }
-      #           event: always
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
+      - notify_on_success:
+          context: [slack]
+          requires:
+            - build-frontend
+            - build-backend
+            - test-frontend
+            - test-backend
+            - scan-backend
+            - scan-frontend
+            - deploy-infrastructure
+            - configure-infrastructure
+            - run-migrations
+            - deploy-frontend
+            - deploy-backend
+            - smoke-test
+            - cloudfront-update
+            - cleanup
+          post-steps:
+            - slack/notify:
+                custom: |
+                  {
+                    "text": "",
+                    "blocks": [
+                      {
+                        "type": "section",
+                        "text": {
+                          "type": "mrkdwn",
+                          "text": "✅ *Success* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                        }
+                      },
+                      {
+                        "type": "actions",
+                        "elements": [
+                          {
+                            "type": "button",
+                            "text": {
+                              "type": "plain_text",
+                              "text": "View Job"
+                            },
+                            "url": "${CIRCLE_BUILD_URL}"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                event: always
