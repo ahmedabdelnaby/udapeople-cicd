@@ -2,8 +2,8 @@
 
 ## The Needed Links
 
-1. [Github Repository] (https://github.com/ahmedabdelnaby/udapeople-cicd).
-2. [S3 Bucket] (http://udapeople-83c292b.s3-website-us-west-2.amazonaws.com).
-3. [CloudFront Destination] (http://dsc1epkmrkkmn.cloudfront.net).
-4. [The Deployed App on EC2] (ec2-54-201-111-82.us-west-2.compute.amazonaws.com).
-5. [Prometheues Server] (ec2-54-201-111-82.us-west-2.compute.amazonaws.com).
+1. [URL01] (https://github.com/ahmedabdelnaby/udapeople-cicd).
+2. [URL02] (http://udapeople-9b6ae84.s3-website-us-west-2.amazonaws.com).
+3. [URL03] (http://d2bhl28bkr0rz0.cloudfront.net/).
+4. [URL04] (ec2-35-81-157-240.us-west-2.compute.amazonaws.com).
+5. [URL05] (ec2-35-163-69-111.us-west-2.compute.amazonaws.com).
